@@ -1,0 +1,69 @@
+<table>
+    <tr>
+        <td>/scores</td>
+        <td>GET</td>
+        <td>Fetch all scores</td>
+    </tr>
+    <tr>
+        <td>/scores</td>
+        <td>POST</td>
+        <td>Add new score</td>
+    </tr>
+    <tr>
+        <td>/scores/:score_id</td>
+        <td>GET</td>
+        <td>Get single score</td>
+    </tr>
+    <tr>
+        <td>/scores/:score_id</td>
+        <td>PUT</td>
+        <td>Update score</td>
+    </tr>
+    <tr>
+        <td>/scores/:score_id</td>
+        <td>DELETE</td>
+        <td>Delete score</td>
+    </tr>
+</table>
+  
+{{#if message}}
+<div class="message">
+    {{ message }}
+</div>
+{{/if}}
+
+{{#if user }}
+    Logged in as {{ user.username }}.<br>
+    <a href="/logout">Log out</a>
+{{ else }}
+<form action="/" method="post" class="form form--login">
+    <div class="form__wrapper">
+        <a href="#" class="form--close">Close</a>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="Name" required="required">
+
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Password" required="required">
+        
+        <div class="form__row">
+            <input type="submit" class="button" value="Login">
+        </div>
+    </div>
+</form>
+
+
+<form action="/signup" method="post" class="form form--signup">
+    <div class="form__wrapper">
+        <a href="#" class="form--close">Close</a>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="Name" required="required">
+
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Password" required="required">
+        
+        <div class="form__row">
+            <input type="submit" class="button" value="Sign up">
+        </div>
+    </div>
+</form>
+{{/if}}

@@ -1,9 +1,33 @@
 var express = require('express');
-var router = express.Router();
+// var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+module.exports = function(app, passport) {
+    /* GET home page. */
+    app.get('/', function(req, res) {
+        res.render('home', {
+            title: 'High Scores',
+            user: req.user,
+            message: req.flash('message')
+        });
+    });
 
-module.exports = router;
+    app.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
+    });
+
+    app.get('/signup', function(req, res) {
+        res.render('signup', { message: req.flash('message') });
+    });
+    app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect: '/',
+        failureRedirect: '/',
+        failureFlash: true
+    }));
+
+}
+
+// login
+
+
+
