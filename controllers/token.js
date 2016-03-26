@@ -3,40 +3,54 @@ var jwt = require('jwt-simple');
 var secret = require('../config/session').secret;
 
 module.exports = function(req, res, next) {
-    console.log('token');
-    console.log(req.body.access_token);
-    
-    var token = (req.body && req.body.access_token) ||
-        (req.query && req.query.access_token) ||
+    const token = req.body.access_token ||
+        req.query.access_token ||
         req.headers['x-access-token'];
 
     if(token) {
         try {
             var decoded = jwt.decode(token, secret);
             if(decoded.exp <= Date.now()) {
-                res.end('Access token has expired', 400);
+                // res.end('Access token has expired', 400);
+                return res.status(403).send({
+                    success: false,
+                    message: 'Token expired'
+                });
             }
 
             console.log(decoded);
 
             User.findOne({ _id: decoded.iss }, function(err, user) {
                 if(err) {
-                    console.error(err);
-                    return res.end(500);
+                    console.log(err);
+                    return res.status(403).send({
+                        success: false,
+                        message: 'Error authenticating token'
+                    });
                 }
 
                 if(!user) {
-                    console.error(err);
-                    return res.end('No user found', 400);
+                    return res.status(403).send({
+                        success: false,
+                        message: 'Failed to authenticate token'
+                    });
                 }
+
                 req.user = user;
-                return next();
+                next();
             });
         } catch(err) {
             console.log(err);
-            return next();
+            return res.status(403).send({
+                success: false,
+                message: 'Failed to authenticate token'
+            });
         }
+
     } else {
-        next();
+        return res.status(403).send({
+            success: false,
+            message: 'No token provided'
+        });
     }
 };

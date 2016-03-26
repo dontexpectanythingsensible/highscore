@@ -3,20 +3,13 @@ const router = express.Router();
 const Score = require('../models/score');
 const passport = require('passport');
 const authController = require('../controllers/auth')(passport);
+const secret = require('../config/session').secret;
+const jwt = require('jwt-simple');
 
-var bodyParser = require('body-parser');
-var tokenAuth = require('../controllers/token');
+const bodyParser = require('body-parser');
+const tokenAuth = require('../controllers/token');
 
-function isLoggedIn(req, res, next) {
-    if(req.isAuthenticated()) {
-        return next();
-    }
-
-    // 401 = not logged in
-    // 403 = logged in but don't have permission
-    res.status(403);
-    res.json({ message: 'Please log in' });
-};
+router.use(tokenAuth);
 
 router.route('/')
     .get((req, res) => {
@@ -29,7 +22,7 @@ router.route('/')
         });
     })
 
-    .post(isLoggedIn, (req, res) => {
+    .post((req, res) => {
         const score = new Score();
         score.user = req.body.user;
         score.score = req.body.score;
@@ -42,7 +35,10 @@ router.route('/')
                 res.send(err);
             }
 
-            return res.json({ message: 'created!' });
+            return res.json({
+                success: true,
+                message: 'created!'
+            });
         });
     });
 
@@ -57,7 +53,7 @@ router.route('/:score_id')
         });
     })
 
-    .put([bodyParser(), tokenAuth], (req, res) => {
+    .put((req, res) => {
         if(req.user) {
             Score.findById(req.params.score_id, (err, score) => {
                 if(err) {
@@ -80,19 +76,29 @@ router.route('/:score_id')
             });
         } else {
             res.status(403);
-            res.json({ message: 'Please log in' });
+            res.json({
+                success: false,
+                message: 'Please log in'
+            });
         }
     })
 
-    .delete(isLoggedIn, (req, res) => {
+    .delete((req, res) => {
         Score.remove({
             _id: req.params.score_id
         }, (err, score) => {
             if(err) {
-                res.send(err);
+                // res.send(err);
+                res.json({
+                    success: false,
+                    message: 'Error deleting score'
+                });
             }
 
-            res.send('Deleted!');
+            res.json({
+                success: true,
+                message: 'Deleted!'
+            });
         });
     });
 
