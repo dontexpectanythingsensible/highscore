@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Score = require('../models/score');
-const passport = require('passport');
-const authController = require('../controllers/auth')(passport);
-const secret = require('../config/session').secret;
-const jwt = require('jwt-simple');
+// const passport = require('passport');
+// const authController = require('../controllers/auth')(passport);
+// const secret = require('../config/session').secret;
+// const jwt = require('jwt-simple');
 
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const tokenAuth = require('../controllers/token');
 
 router.use(tokenAuth);
@@ -99,6 +99,17 @@ router.route('/:score_id')
                 success: true,
                 message: 'Deleted!'
             });
+        });
+    });
+
+router.route('/user/:user_id')
+    .get((req, res) => {
+        Score.find({ user: req.params.user_id }, (err, scores) => {
+            if(err) {
+                res.send(err);
+            }
+
+            res.json(scores);
         });
     });
 
